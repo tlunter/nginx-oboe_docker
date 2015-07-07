@@ -15,9 +15,9 @@ diff -rupN original/ngx_http_oboe_filter_module.c new/ngx_http_oboe_filter_modul
      oboe_init();
 -    result = oboe_reporter_udp_init(&plugin_data.reporter, "127.0.0.1", "7831");
 +
-+    char *port_buffer = malloc(sizeof(char) * 30);
++    char port_buffer[6];
 +    int port = (conf->reporter_port == NGX_CONF_UNSET_UINT) ? 7831 : (int)conf->reporter_port;
-+    sprintf(port_buffer, "%d", port);
++    snprintf(port_buffer, sizeof(port_buffer), "%d", port);
 +
 +    result = oboe_reporter_udp_init(&plugin_data.reporter, (char*)conf->reporter_host.data, port_buffer);
      assert(plugin_data.reporter.send);
