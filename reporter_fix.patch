@@ -1,0 +1,25 @@
+diff -rupN original/ngx_http_oboe_filter_module.c new/ngx_http_oboe_filter_module.c
+--- original/ngx_http_oboe_filter_module.c	2015-03-16 15:10:31.000000000 -0400
++++ new/ngx_http_oboe_filter_module.c	2015-07-06 21:16:45.000000000 -0400
+@@ -248,12 +248,17 @@ static ngx_int_t ngx_http_oboe_filter_in
+     //
+     // main configuration can be accessed as follows (needs to be populated):
+     //
+-    // plugin_config *conf;
+-    // conf = ngx_http_conf_get_module_main_conf(cf, ngx_http_oboe_filter_module);
+-    // assert(conf);
++    plugin_config *conf;
++    conf = ngx_http_conf_get_module_loc_conf(cf, ngx_http_oboe_filter_module);
++    assert(conf);
+ 
+     oboe_init();
+-    result = oboe_reporter_udp_init(&plugin_data.reporter, "127.0.0.1", "7831");
++
++    char *port_buffer = malloc(sizeof(char) * 30);
++    int port = (conf->reporter_port == NGX_CONF_UNSET_UINT) ? 7831 : (int)conf->reporter_port;
++    sprintf(port_buffer, "%d", port);
++
++    result = oboe_reporter_udp_init(&plugin_data.reporter, (char*)conf->reporter_host.data, port_buffer);
+     assert(plugin_data.reporter.send);
+     if (result < 0) {
+         return NGX_ERROR;

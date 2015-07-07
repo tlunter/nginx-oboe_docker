@@ -15,8 +15,10 @@ RUN wget -q -O nginx-1.7.9.tar.gz http://nginx.org/download/nginx-1.7.9.tar.gz
 RUN tar xvf nginx-1.7.9.tar.gz
 
 # Download nginx-oboe
-RUN wget -q -O nginx-oboe.tar.gz https://files.tracelytics.com/src/nginx_oboe-latest.x86_64.tar.gz
+ADD https://files.tracelytics.com/src/nginx_oboe-latest.x86_64.tar.gz /tmp/nginx-oboe.tar.gz
+ADD reporter_fix.patch /tmp/reporter_fix.patch
 RUN tar xvf nginx-oboe.tar.gz
+RUN patch -dnginx_oboe < reporter_fix.patch
 
 # Install nginx 1.7.9
 WORKDIR /tmp/nginx-1.7.9/
@@ -56,6 +58,8 @@ RUN ./configure \
     --add-module=../nginx_oboe
 RUN make -j 4
 RUN make -j 4 install
+RUN mkdir -p /var/lib/nginx
+RUN mkdir -p /var/log/nginx
 
 ADD nginx.conf /opt/nginx/nginx.conf
 USER root
