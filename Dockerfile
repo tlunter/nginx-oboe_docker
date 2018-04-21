@@ -1,18 +1,16 @@
 FROM ubuntu:14.04
 
-RUN apt-get -y update
-RUN apt-get -y install build-essential zlib1g-dev libssl-dev wget libpcre3 libpcre3-dev
+RUN apt-get -y update && apt-get -y install build-essential zlib1g-dev libssl-dev wget libpcre3 libpcre3-dev
 
 # Add tracelytics stuff
 ADD appneta.list /etc/apt/sources.list.d/appneta.list
 RUN /bin/sh -c "wget -qO- https://apt.appneta.com/appneta-apt-key.pub | apt-key add -"
-RUN apt-get -y update
-RUN apt-get -y install liboboe0 liboboe-dev
+RUN apt-get -y update && apt-get -y install liboboe0 liboboe-dev
 
-# Download nginx 1.7.9
+# Download nginx 1.14.0
 WORKDIR /tmp/
-RUN wget -q -O nginx-1.7.9.tar.gz http://nginx.org/download/nginx-1.7.9.tar.gz
-RUN tar xvf nginx-1.7.9.tar.gz
+RUN wget -q -O nginx-1.14.0.tar.gz http://nginx.org/download/nginx-1.14.0.tar.gz
+RUN tar xvf nginx-1.14.0.tar.gz
 
 # Download nginx-oboe
 ADD https://files.tracelytics.com/src/nginx_oboe-latest.x86_64.tar.gz /tmp/nginx-oboe.tar.gz
@@ -20,8 +18,8 @@ ADD reporter_fix.patch /tmp/reporter_fix.patch
 RUN tar xvf nginx-oboe.tar.gz
 RUN patch -dnginx_oboe < reporter_fix.patch
 
-# Install nginx 1.7.9
-WORKDIR /tmp/nginx-1.7.9/
+# Install nginx 1.14.0
+WORKDIR /tmp/nginx-1.14.0/
 RUN ./configure \
     --prefix=/opt/nginx \
     --conf-path=/opt/nginx/nginx.conf \
@@ -46,7 +44,6 @@ RUN ./configure \
     --with-http_gunzip_module \
     --with-http_gzip_static_module \
     --with-http_realip_module \
-    --with-http_spdy_module \
     --with-http_ssl_module \
     --with-http_stub_status_module \
     --with-http_addition_module \
